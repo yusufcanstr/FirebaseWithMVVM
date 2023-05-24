@@ -49,6 +49,11 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 
+    //LiveData
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.6.1'
+    //fragment
+    implementation 'androidx.fragment:fragment-ktx:1.5.7'
+
     //Firebase
     implementation 'com.google.firebase:firebase-auth-ktx:21.0.3'
     implementation 'com.google.firebase:firebase-firestore:24.1.1'
