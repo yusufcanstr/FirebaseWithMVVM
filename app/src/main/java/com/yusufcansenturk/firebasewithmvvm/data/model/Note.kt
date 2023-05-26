@@ -1,12 +1,12 @@
 package com.yusufcansenturk.firebasewithmvvm.data.model
 
 import com.google.firebase.firestore.ServerTimestamp
-import java.util.Date
+import java.util.*
 
 data class Note(
-    val id: String,
-    val text:String,
+    var id: String = "",
+    val text: String = "",
     @ServerTimestamp
-    val date:Date
+    val date: Date = Date(),
 )
 
