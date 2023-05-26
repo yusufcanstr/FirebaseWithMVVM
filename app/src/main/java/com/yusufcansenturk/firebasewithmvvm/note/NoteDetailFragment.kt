@@ -21,7 +21,8 @@ class NoteDetailFragment : Fragment() {
     val TAG:String = ""
     lateinit var binding :FragmentNoteDetailBinding
     val viewModel :NoteViewModel by viewModels()
-
+    var isEdit  = false
+    var objNote:Note? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -34,16 +35,50 @@ class NoteDetailFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        updateUI()
         binding.button.setOnClickListener {
-            if (validation()) {
-                viewModel.addNote(
-                    Note(
-                        id = "",
-                        text = binding.noteMsg.text.toString(),
-                        date = Date()
-                    )
-                )
+            if (isEdit) {
+                updateNote()
+            }else {
+                createNote()
             }
+        }
+    }
+
+    private fun updateUI() {
+        val type = arguments?.getString("type", null)
+        type?.let {
+            when(it) {
+                "view" -> {
+                    isEdit = false
+                    binding.noteMsg.isEnabled = false
+                    objNote = arguments?.getParcelable("note")
+                    binding.noteMsg.setText(objNote?.text)
+                    binding.button.hide()
+                }
+                "create" -> {
+                    isEdit = false
+                    binding.button.setText("Create")
+                }
+                "edit" -> {
+                    isEdit = true
+                    objNote = arguments?.getParcelable("note")
+                    binding.noteMsg.setText(objNote?.text)
+                    binding.button.setText("Update")
+                }
+            }
+        }
+    }
+
+    private fun createNote() {
+        if (validation()) {
+            viewModel.addNote(
+                Note(
+                    id = "",
+                    text = binding.noteMsg.text.toString(),
+                    date = Date()
+                )
+            )
         }
         viewModel.addNote.observe(viewLifecycleOwner) { state ->
             when(state) {
@@ -59,6 +94,36 @@ class NoteDetailFragment : Fragment() {
                 is UiState.Success -> {
                     binding.btnProgressAr.hide()
                     binding.button.text = "Create"
+                    toast(state.data)
+                }
+            }
+        }
+    }
+
+    private fun updateNote() {
+        if (validation()) {
+            viewModel.updateNote(
+                Note(
+                    id = objNote?.id ?: "",
+                    text = binding.noteMsg.text.toString(),
+                    date = Date()
+                )
+            )
+        }
+        viewModel.updateNote.observe(viewLifecycleOwner) { state ->
+            when(state) {
+                is UiState.Loading -> {
+                    binding.btnProgressAr.show()
+                    binding.button.text = ""
+                }
+                is UiState.Failure -> {
+                    binding.btnProgressAr.hide()
+                    binding.button.text = "Update"
+                    state.error?.let { toast(it) }
+                }
+                is UiState.Success -> {
+                    binding.btnProgressAr.hide()
+                    binding.button.text = "Update"
                     toast(state.data)
                 }
             }

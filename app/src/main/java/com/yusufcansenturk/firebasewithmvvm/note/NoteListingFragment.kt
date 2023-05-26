@@ -12,6 +12,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.firebasewithmvvm.note.NoteListingAdapter
 import com.yusufcansenturk.firebasewithmvvm.R
+import com.yusufcansenturk.firebasewithmvvm.data.model.Note
 import com.yusufcansenturk.firebasewithmvvm.databinding.FragmentNoteListingBinding
 import com.yusufcansenturk.firebasewithmvvm.util.UiState
 import com.yusufcansenturk.firebasewithmvvm.util.hide
@@ -26,16 +27,25 @@ class NoteListingFragment : Fragment() {
     lateinit var binding: FragmentNoteListingBinding
     val TAG :String = "NoteListingFragment"
     val viewModel :NoteViewModel by viewModels()
+    var deletePosition: Int = -1
+    var list: MutableList<Note> = arrayListOf()
     val adapter by lazy {
         NoteListingAdapter(
             onItemClicked = { pos, item ->
-
+                findNavController().navigate(R.id.action_noteListingFragment_to_noteDetailFragment, Bundle().apply {
+                    putString("type", "view")
+                    putParcelable("note",item)
+                })
             },
             onEditClicked = { pos, item ->
-
+                findNavController().navigate(R.id.action_noteListingFragment_to_noteDetailFragment, Bundle().apply {
+                    putString("type", "edit")
+                    putParcelable("note", item)
+                })
             },
             onDeleteClicked = { pos, item ->
-
+                deletePosition = pos
+                viewModel.deleteNote(item)
             }
             )
     }
@@ -54,7 +64,9 @@ class NoteListingFragment : Fragment() {
         binding.recyclerView.adapter = adapter
         binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
         binding.button.setOnClickListener {
-            findNavController().navigate(R.id.action_noteListingFragment_to_noteDetailFragment)
+            findNavController().navigate(R.id.action_noteListingFragment_to_noteDetailFragment, Bundle().apply {
+                putString("type", "create")
+            })
         }
         viewModel.getNotes()
         viewModel.note.observe(viewLifecycleOwner) { state ->
@@ -68,7 +80,28 @@ class NoteListingFragment : Fragment() {
                 }
                 is UiState.Success -> {
                     binding.progressBar.hide()
-                    adapter.updateList(state.data.toMutableList())
+                    list = state.data.toMutableList()
+                    adapter.updateList(list)
+                }
+            }
+        }
+
+        viewModel.deleteNote.observe(viewLifecycleOwner) { state ->
+            when(state) {
+                is UiState.Loading -> {
+                    binding.progressBar.show()
+                }
+                is UiState.Failure -> {
+                    binding.progressBar.hide()
+                    state.error?.let { toast(it) }
+                }
+                is UiState.Success -> {
+                    binding.progressBar.hide()
+                    toast(state.data)
+                    if (deletePosition != -1) {
+                        list.removeAt(deletePosition)
+                        adapter.updateList(list)
+                    }
                 }
             }
         }
