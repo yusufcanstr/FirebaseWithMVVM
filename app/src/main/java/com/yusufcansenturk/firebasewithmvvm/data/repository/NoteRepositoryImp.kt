@@ -68,5 +68,23 @@ class NoteRepositoryImp(
             }
     }
 
+    override fun deleteNote(note: Note, result: (UiState<String>) -> Unit) {
+        val document = database.collection(FireStoreTables.NOTE).document(note.id)
+        document
+            .delete()
+            .addOnSuccessListener {
+                result.invoke(
+                    UiState.Success("Note has been deleted successfully")
+                )
+            }
+            .addOnFailureListener {
+                result.invoke(
+                    UiState.Failure(
+                        it.localizedMessage
+                    )
+                )
+            }
+    }
+
 
 }

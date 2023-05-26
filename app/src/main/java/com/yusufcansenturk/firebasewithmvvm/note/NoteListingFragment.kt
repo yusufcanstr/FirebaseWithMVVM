@@ -12,6 +12,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.firebasewithmvvm.note.NoteListingAdapter
 import com.yusufcansenturk.firebasewithmvvm.R
+import com.yusufcansenturk.firebasewithmvvm.data.model.Note
 import com.yusufcansenturk.firebasewithmvvm.databinding.FragmentNoteListingBinding
 import com.yusufcansenturk.firebasewithmvvm.util.UiState
 import com.yusufcansenturk.firebasewithmvvm.util.hide
@@ -26,6 +27,8 @@ class NoteListingFragment : Fragment() {
     lateinit var binding: FragmentNoteListingBinding
     val TAG :String = "NoteListingFragment"
     val viewModel :NoteViewModel by viewModels()
+    var deletePosition: Int = -1
+    var list: MutableList<Note> = arrayListOf()
     val adapter by lazy {
         NoteListingAdapter(
             onItemClicked = { pos, item ->
@@ -41,7 +44,8 @@ class NoteListingFragment : Fragment() {
                 })
             },
             onDeleteClicked = { pos, item ->
-
+                deletePosition = pos
+                viewModel.deleteNote(item)
             }
             )
     }
@@ -76,7 +80,28 @@ class NoteListingFragment : Fragment() {
                 }
                 is UiState.Success -> {
                     binding.progressBar.hide()
-                    adapter.updateList(state.data.toMutableList())
+                    list = state.data.toMutableList()
+                    adapter.updateList(list)
+                }
+            }
+        }
+
+        viewModel.deleteNote.observe(viewLifecycleOwner) { state ->
+            when(state) {
+                is UiState.Loading -> {
+                    binding.progressBar.show()
+                }
+                is UiState.Failure -> {
+                    binding.progressBar.hide()
+                    state.error?.let { toast(it) }
+                }
+                is UiState.Success -> {
+                    binding.progressBar.hide()
+                    toast(state.data)
+                    if (deletePosition != -1) {
+                        list.removeAt(deletePosition)
+                        adapter.updateList(list)
+                    }
                 }
             }
         }
