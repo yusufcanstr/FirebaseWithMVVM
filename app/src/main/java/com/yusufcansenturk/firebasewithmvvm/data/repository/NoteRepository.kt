@@ -9,4 +9,6 @@ interface NoteRepository {
 
     fun addNote(note: Note, result: (UiState<String>) -> Unit)
 
+    fun updateNote(note: Note, result: (UiState<String>) -> Unit)
+
 }
