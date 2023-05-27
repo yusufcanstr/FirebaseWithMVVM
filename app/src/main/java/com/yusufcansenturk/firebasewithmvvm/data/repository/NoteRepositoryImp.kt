@@ -1,8 +1,10 @@
 package com.yusufcansenturk.firebasewithmvvm.data.repository
 
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import com.yusufcansenturk.firebasewithmvvm.data.model.Note
-import com.yusufcansenturk.firebasewithmvvm.util.FireStoreTables
+import com.yusufcansenturk.firebasewithmvvm.util.FireStoreCollection
+import com.yusufcansenturk.firebasewithmvvm.util.FireStoreDocumentField
 import com.yusufcansenturk.firebasewithmvvm.util.UiState
 
 class NoteRepositoryImp(
@@ -10,7 +12,8 @@ class NoteRepositoryImp(
 ) : NoteRepository {
 
     override fun getNotes(result: (UiState<List<Note>>) -> Unit) {
-        database.collection(FireStoreTables.NOTE)
+        database.collection(FireStoreCollection.NOTE)
+            .orderBy(FireStoreDocumentField.DATE, Query.Direction.DESCENDING)
             .get()
             .addOnSuccessListener {
                 val notes = arrayListOf<Note>()
@@ -31,14 +34,14 @@ class NoteRepositoryImp(
             }
     }
 
-    override fun addNote(note: Note, result: (UiState<String>) -> Unit) {
-        val document = database.collection(FireStoreTables.NOTE).document()
+    override fun addNote(note: Note, result: (UiState<Pair<Note,String>>) -> Unit) {
+        val document = database.collection(FireStoreCollection.NOTE).document()
         note.id = document.id
         document
             .set(note)
             .addOnSuccessListener {
                 result.invoke(
-                    UiState.Success("Note has been created successfully")
+                    UiState.Success(Pair(note,"Note has been created successfully"))
                 )
             }
             .addOnFailureListener {
@@ -51,7 +54,7 @@ class NoteRepositoryImp(
     }
 
     override fun updateNote(note: Note, result: (UiState<String>) -> Unit) {
-        val document = database.collection(FireStoreTables.NOTE).document(note.id)
+        val document = database.collection(FireStoreCollection.NOTE).document(note.id)
         document
             .set(note)
             .addOnSuccessListener {
@@ -69,22 +72,13 @@ class NoteRepositoryImp(
     }
 
     override fun deleteNote(note: Note, result: (UiState<String>) -> Unit) {
-        val document = database.collection(FireStoreTables.NOTE).document(note.id)
-        document
+        database.collection(FireStoreCollection.NOTE).document(note.id)
             .delete()
             .addOnSuccessListener {
-                result.invoke(
-                    UiState.Success("Note has been deleted successfully")
-                )
+                result.invoke(UiState.Success("Note successfully deleted!"))
             }
-            .addOnFailureListener {
-                result.invoke(
-                    UiState.Failure(
-                        it.localizedMessage
-                    )
-                )
+            .addOnFailureListener { e ->
+                result.invoke(UiState.Failure(e.message))
             }
     }
-
-
 }
