@@ -170,7 +170,13 @@
                 android:layout_height="wrap_content"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="@+id/date"
-                app:layout_constraintTop_toBottomOf="@+id/space"/>
+                app:layout_constraintTop_toBottomOf="@+id/space">
+
+                <include
+                    layout="@layout/item_chip"
+                    android:visibility="invisible" />
+
+            </com.google.android.material.chip.ChipGroup>
 
             <View
                 android:id="@+id/middle_divider"

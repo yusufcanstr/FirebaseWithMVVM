@@ -63,7 +63,6 @@ fun Context.createDialog(layout: Int, cancelable: Boolean): Dialog {
     dialog.setCancelable(cancelable)
     return dialog
 }
-
 val Int.dpToPx: Int
     get() = (this * Resources.getSystem().displayMetrics.density).toInt()
 
