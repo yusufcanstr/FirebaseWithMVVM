@@ -1,4 +1,4 @@
-package com.yusufcansenturk.firebasewithmvvm.note
+package com.yusufcansenturk.firebasewithmvvm.ui.note
 
 import android.app.ActionBar
 import android.os.Bundle

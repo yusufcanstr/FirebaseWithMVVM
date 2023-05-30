@@ -1,9 +1,10 @@
 package com.yusufcansenturk.firebasewithmvvm.util
 
 object FireStoreCollection{
-    val NOTE = "note"
+    const val NOTE = "note"
+    const val USER = "user"
 }
 
 object FireStoreDocumentField {
-    val DATE = "date"
+    const val DATE = "date"
 }
