@@ -1,4 +1,4 @@
-package com.yusufcansenturk.firebasewithmvvm.note
+package com.yusufcansenturk.firebasewithmvvm.ui.note
 
 import android.app.ActionBar
 import android.os.Bundle
@@ -109,7 +109,7 @@ class NoteDetailFragment : Fragment() {
     private fun updateUI() {
         val sdf = SimpleDateFormat("dd MMM yyyy . hh:mm a")
         objNote = arguments?.getParcelable("note")
-        binding.tags.layoutParams.height = 40.dpToPx
+        binding.tags.layoutParams.height = 30.dpToPx
         objNote?.let { note ->
             binding.title.setText(note.title)
             binding.date.setText(sdf.format(note.date))

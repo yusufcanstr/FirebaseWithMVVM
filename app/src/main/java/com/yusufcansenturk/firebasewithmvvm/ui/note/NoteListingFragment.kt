@@ -1,4 +1,4 @@
-package com.yusufcansenturk.firebasewithmvvm.note
+package com.yusufcansenturk.firebasewithmvvm.ui.note
 
 import android.os.Bundle
 import android.view.LayoutInflater

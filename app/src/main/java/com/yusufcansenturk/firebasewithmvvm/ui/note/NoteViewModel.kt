@@ -1,4 +1,4 @@
-package com.yusufcansenturk.firebasewithmvvm.note
+package com.yusufcansenturk.firebasewithmvvm.ui.note
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
