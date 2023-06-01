@@ -3,16 +3,19 @@ package com.yusufcansenturk.firebasewithmvvm.data.repository
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.yusufcansenturk.firebasewithmvvm.data.model.Note
+import com.yusufcansenturk.firebasewithmvvm.data.model.User
 import com.yusufcansenturk.firebasewithmvvm.util.FireStoreCollection
 import com.yusufcansenturk.firebasewithmvvm.util.FireStoreDocumentField
+import com.yusufcansenturk.firebasewithmvvm.util.FireStoreDocumentField.USER_ID
 import com.yusufcansenturk.firebasewithmvvm.util.UiState
 
 class NoteRepositoryImp(
-    val database: FirebaseFirestore
+    private val database: FirebaseFirestore
 ) : NoteRepository {
 
-    override fun getNotes(result: (UiState<List<Note>>) -> Unit) {
+    override fun getNotes(user: User?, result: (UiState<List<Note>>) -> Unit) {
         database.collection(FireStoreCollection.NOTE)
+            .whereEqualTo(USER_ID,user?.id)
             .orderBy(FireStoreDocumentField.DATE, Query.Direction.DESCENDING)
             .get()
             .addOnSuccessListener {

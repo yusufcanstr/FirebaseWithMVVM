@@ -17,6 +17,7 @@ import com.yusufcansenturk.firebasewithmvvm.databinding.FragmentNoteDetailBindin
 import com.yusufcansenturk.firebasewithmvvm.util.*
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.chip.Chip
+import com.yusufcansenturk.firebasewithmvvm.ui.auth.AuthViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
 import java.util.*
@@ -24,21 +25,21 @@ import java.util.*
 @AndroidEntryPoint
 class NoteDetailFragment : Fragment() {
 
-    val TAG: String = "NoteDetailFragment"
-    lateinit var binding: FragmentNoteDetailBinding
-    val viewModel: NoteViewModel by viewModels()
-    var objNote: Note? = null
-    var tagsList: MutableList<String> = arrayListOf()
+    private lateinit var binding: FragmentNoteDetailBinding
+    private val viewModel: NoteViewModel by viewModels()
+    private val authViewModel: AuthViewModel by viewModels()
+    private var objNote: Note? = null
+    private var tagsList: MutableList<String> = arrayListOf()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        if (this::binding.isInitialized){
-            return binding.root
+        return if (this::binding.isInitialized){
+            binding.root
         }else {
             binding = FragmentNoteDetailBinding.inflate(layoutInflater)
-            return binding.root
+            binding.root
         }
     }
 
@@ -245,6 +246,6 @@ class NoteDetailFragment : Fragment() {
             description = binding.description.text.toString(),
             tags = tagsList,
             date = Date()
-        )
+        ).apply { authViewModel.getSession { this.user_id = it?.id ?: "" } }
     }
 }
