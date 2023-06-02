@@ -1,4 +1,9 @@
 buildscript {
+    repositories {
+        google()
+        maven { url 'https://jitpack.io' }
+
+    }
     dependencies {
         def nav_version = "2.4.1"
         def hilt_version = '2.44'
