@@ -1,18 +1,29 @@
 package com.yusufcansenturk.firebasewithmvvm.data.repository
 
+import android.net.Uri
+import com.google.firebase.FirebaseException
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.Query
+import com.google.firebase.storage.StorageReference
 import com.yusufcansenturk.firebasewithmvvm.data.model.Note
+import com.yusufcansenturk.firebasewithmvvm.data.model.User
 import com.yusufcansenturk.firebasewithmvvm.util.FireStoreCollection
 import com.yusufcansenturk.firebasewithmvvm.util.FireStoreDocumentField
+import com.yusufcansenturk.firebasewithmvvm.util.FireStoreDocumentField.USER_ID
 import com.yusufcansenturk.firebasewithmvvm.util.UiState
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 
 class NoteRepositoryImp(
-    val database: FirebaseFirestore
+    private val database: FirebaseFirestore,
+    private val storageReference: StorageReference
 ) : NoteRepository {
 
-    override fun getNotes(result: (UiState<List<Note>>) -> Unit) {
+    override fun getNotes(user: User?, result: (UiState<List<Note>>) -> Unit) {
         database.collection(FireStoreCollection.NOTE)
+            .whereEqualTo(USER_ID,user?.id)
             .orderBy(FireStoreDocumentField.DATE, Query.Direction.DESCENDING)
             .get()
             .addOnSuccessListener {
@@ -80,5 +91,23 @@ class NoteRepositoryImp(
             .addOnFailureListener { e ->
                 result.invoke(UiState.Failure(e.message))
             }
+    }
+
+    override suspend fun uploadSingleFile(fileUri: Uri, onResult: (UiState<Uri>) -> Unit) {
+        try {
+            val uri : Uri = withContext(Dispatchers.IO) {
+                storageReference
+                    .putFile(fileUri)
+                    .await()
+                    .storage
+                    .downloadUrl
+                    .await()
+            }
+            onResult.invoke(UiState.Success(uri))
+        }catch (e: FirebaseException) {
+            onResult.invoke(UiState.Failure(e.message))
+        }catch (e: Exception) {
+            onResult.invoke(UiState.Failure(e.message))
+        }
     }
 }
