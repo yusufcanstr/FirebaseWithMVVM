@@ -11,8 +11,11 @@ import com.yusufcansenturk.firebasewithmvvm.data.model.User
 import com.yusufcansenturk.firebasewithmvvm.util.FireStoreCollection
 import com.yusufcansenturk.firebasewithmvvm.util.FireStoreDocumentField
 import com.yusufcansenturk.firebasewithmvvm.util.FireStoreDocumentField.USER_ID
+import com.yusufcansenturk.firebasewithmvvm.util.FirebaseStorageConstants.NOTE_IMAGES
 import com.yusufcansenturk.firebasewithmvvm.util.UiState
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 
@@ -107,6 +110,31 @@ class NoteRepositoryImp(
         }catch (e: FirebaseException) {
             onResult.invoke(UiState.Failure(e.message))
         }catch (e: Exception) {
+            onResult.invoke(UiState.Failure(e.message))
+        }
+    }
+
+    override suspend fun uploadMultipleFile(
+        fileUri: List<Uri>,
+        onResult: (UiState<List<Uri>>) -> Unit
+    ) {
+        try {
+            val uri: List<Uri> = withContext(Dispatchers.IO) {
+                fileUri.map { image ->
+                    async {
+                        storageReference.child(NOTE_IMAGES).child(image.lastPathSegment ?: "${System.currentTimeMillis()}")
+                            .putFile(image)
+                            .await()
+                            .storage
+                            .downloadUrl
+                            .await()
+                    }
+                }.awaitAll()
+            }
+            onResult.invoke(UiState.Success(uri))
+        } catch (e: FirebaseException){
+            onResult.invoke(UiState.Failure(e.message))
+        }catch (e: Exception){
             onResult.invoke(UiState.Failure(e.message))
         }
     }
