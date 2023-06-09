@@ -63,7 +63,7 @@ class LoginFragment : Fragment() {
                     binding.loginBtn.text = "Login"
                     binding.loginProgress.hide()
                     toast(state.data)
-                    findNavController().navigate(R.id.action_loginFragment_to_noteListingFragment)
+                    findNavController().navigate(R.id.action_loginFragment_to_home_navigation)
                 }
             }
         }
@@ -97,7 +97,7 @@ class LoginFragment : Fragment() {
         super.onStart()
         viewModel.getSession { user ->
             if (user != null) {
-                findNavController().navigate(R.id.action_loginFragment_to_noteListingFragment)
+                findNavController().navigate(R.id.action_loginFragment_to_home_navigation)
             }
         }
     }
