@@ -52,4 +52,23 @@ class TaskRepositoryImp(
             }
         })
     }
+
+    override fun updateTask(task: Task, result: (UiState<Pair<Task,String>>) -> Unit) {
+        val reference = database.reference.child(FireDatabase.TASK).child(task.id)
+        reference
+            .setValue(task)
+            .addOnSuccessListener {
+                result.invoke(
+                    UiState.Success(Pair(task,"Task has been update successfully"))
+                )
+            }
+            .addOnFailureListener {
+                result.invoke(
+                    UiState.Failure(
+                        it.localizedMessage
+                    )
+                )
+            }
+    }
+
 }

@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.yusufcansenturk.firebasewithmvvm.data.model.Task
 import com.yusufcansenturk.firebasewithmvvm.databinding.FragmentTaskListingBinding
 import com.yusufcansenturk.firebasewithmvvm.ui.auth.AuthViewModel
 import com.yusufcansenturk.firebasewithmvvm.util.UiState
@@ -26,6 +27,7 @@ class TaskListingFragment : Fragment() {
     private lateinit var binding: FragmentTaskListingBinding
     private val adapter by lazy{
         TaskListingAdapter(
+            onItemClicked = { pos, item -> onTaskClicked(item)},
             onDeleteClicked = { pos, item -> }
         )
     }
@@ -53,6 +55,13 @@ class TaskListingFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.addTaskButton.setOnClickListener {
             val createTaskFragmentSheet = CreateTaskFragment()
+            createTaskFragmentSheet.setDismissListener {
+                if (it) {
+                    authViewModel.getSession {
+                        viewModel.getTasks(it)
+                    }
+                }
+            }
             createTaskFragmentSheet.show(childFragmentManager,"create_task")
         }
 
@@ -63,7 +72,6 @@ class TaskListingFragment : Fragment() {
             viewModel.getTasks(it)
         }
         observer()
-
     }
 
     private fun observer(){
@@ -82,6 +90,18 @@ class TaskListingFragment : Fragment() {
                 }
             }
         }
+    }
+
+    private fun onTaskClicked(task: Task){
+        val createTaskFragmentSheet = CreateTaskFragment(task)
+        createTaskFragmentSheet.setDismissListener {
+            if (it) {
+                authViewModel.getSession {user ->
+                    viewModel.getTasks(user)
+                }
+            }
+        }
+        createTaskFragmentSheet.show(childFragmentManager,"create_task")
     }
 
     companion object {
