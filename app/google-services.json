@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "1092186527359",
+    "firebase_url": "https://fir-withmvvm-4ea82-default-rtdb.firebaseio.com",
     "project_id": "fir-withmvvm-4ea82",
     "storage_bucket": "fir-withmvvm-4ea82.appspot.com"
   },
@@ -13,6 +14,14 @@
         }
       },
       "oauth_client": [
+        {
+          "client_id": "1092186527359-kbbq42ciheuk9n6jmsjbckttqoish7or.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.yusufcansenturk.firebasewithmvvm",
+            "certificate_hash": "d4418db002ec038cb88e46dff225825fde94cda2"
+          }
+        },
         {
           "client_id": "1092186527359-tgk4elugvf5rj67vrhcb8udk43tjburc.apps.googleusercontent.com",
           "client_type": 3

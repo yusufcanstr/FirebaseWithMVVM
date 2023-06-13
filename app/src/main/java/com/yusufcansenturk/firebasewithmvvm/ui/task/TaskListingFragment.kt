@@ -13,7 +13,6 @@ private const val ARG_PARAM1 = "param1"
 
 class TaskListingFragment : Fragment() {
 
-    private val TAG: String = "TaskListingFragment"
     private var param1: String? = null
     private lateinit var binding: FragmentTaskListingBinding
 
@@ -38,6 +37,10 @@ class TaskListingFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.addTaskButton.setOnClickListener {
+            val createTaskFragmentSheet = CreateTaskFragment()
+            createTaskFragmentSheet.show(childFragmentManager,"create_task")
+        }
     }
 
     companion object {
