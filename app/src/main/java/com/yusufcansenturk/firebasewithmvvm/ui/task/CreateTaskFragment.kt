@@ -8,8 +8,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
-import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.yusufcansenturk.firebasewithmvvm.R
 import com.yusufcansenturk.firebasewithmvvm.data.model.Task
 import com.yusufcansenturk.firebasewithmvvm.databinding.FragmentCreateTaskBinding
@@ -18,6 +16,8 @@ import com.yusufcansenturk.firebasewithmvvm.util.UiState
 import com.yusufcansenturk.firebasewithmvvm.util.hide
 import com.yusufcansenturk.firebasewithmvvm.util.show
 import com.yusufcansenturk.firebasewithmvvm.util.toast
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
 import java.util.*
@@ -28,7 +28,8 @@ class CreateTaskFragment : BottomSheetDialogFragment() {
     private lateinit var binding: FragmentCreateTaskBinding
     private val viewModel: TaskViewModel by viewModels()
     private val authViewModel: AuthViewModel by viewModels()
-    private var closeFunction: (() -> Unit)? = null
+    var closeFunction: ((Boolean) -> Unit)? = null
+    var isSuccessAddTask: Boolean = false
 
 
     override fun onCreateView(
@@ -65,6 +66,7 @@ class CreateTaskFragment : BottomSheetDialogFragment() {
                     toast(state.error)
                 }
                 is UiState.Success -> {
+                    isSuccessAddTask = true
                     binding.progressBar.hide()
                     toast(state.data.second)
                     this.dismiss()
@@ -75,7 +77,7 @@ class CreateTaskFragment : BottomSheetDialogFragment() {
 
     private fun validation(): Boolean {
         var isValid = true
-        if (binding.taskEt.text.toString().isEmpty()) {
+        if (binding.taskEt.text.toString().isNullOrEmpty()) {
             isValid = false
             toast(getString(R.string.error_task_detail))
         }
@@ -91,7 +93,7 @@ class CreateTaskFragment : BottomSheetDialogFragment() {
         ).apply { authViewModel.getSession { this.user_id = it?.id ?: "" } }
     }
 
-    fun setDismissListener(function: (() -> Unit)?) {
+    fun setDismissListener(function: ((Boolean) -> Unit)?) {
         closeFunction = function
     }
 
@@ -109,6 +111,6 @@ class CreateTaskFragment : BottomSheetDialogFragment() {
 
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
-        closeFunction?.invoke()
+        closeFunction?.invoke(isSuccessAddTask)
     }
 }
