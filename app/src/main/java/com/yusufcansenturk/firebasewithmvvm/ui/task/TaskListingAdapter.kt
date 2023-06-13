@@ -29,8 +29,9 @@ class TaskListingAdapter(
     }
 
     fun removeItem(position: Int){
-        list.removeAt(position)
-        notifyItemChanged(position)
+       // list.removeAt(position)
+        notifyItemRemoved(position)
+        notifyItemRangeChanged(position, list.size)
     }
 
     override fun getItemCount(): Int {

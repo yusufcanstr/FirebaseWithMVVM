@@ -1,6 +1,5 @@
 package com.yusufcansenturk.firebasewithmvvm.data.repository
 
-
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.yusufcansenturk.firebasewithmvvm.data.model.Task
@@ -8,6 +7,7 @@ import com.yusufcansenturk.firebasewithmvvm.util.FireDatabase
 import com.yusufcansenturk.firebasewithmvvm.util.UiState
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.yusufcansenturk.firebasewithmvvm.data.model.Note
 import com.yusufcansenturk.firebasewithmvvm.data.model.User
 
 class TaskRepositoryImp(
@@ -60,6 +60,23 @@ class TaskRepositoryImp(
             .addOnSuccessListener {
                 result.invoke(
                     UiState.Success(Pair(task,"Task has been update successfully"))
+                )
+            }
+            .addOnFailureListener {
+                result.invoke(
+                    UiState.Failure(
+                        it.localizedMessage
+                    )
+                )
+            }
+    }
+
+    override fun deleteTask(task: Task, result: (UiState<Pair<Task,String>>) -> Unit) {
+        val reference = database.reference.child(FireDatabase.TASK).child(task.id)
+        reference.removeValue()
+            .addOnSuccessListener {
+                result.invoke(
+                    UiState.Success(Pair(task,"Task has been deleted successfully"))
                 )
             }
             .addOnFailureListener {
